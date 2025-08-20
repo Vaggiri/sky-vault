@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkyVault | Your Secure Cloud Drive</title>
+    <meta name="description" content="Secure cloud storage for all your files">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="assets/favicon.png">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tailwind CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/animations.css">
+    
+    <!-- Supabase -->
+    
+</head>
+<body class="bg-gray-50 font-sans">
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="fixed inset-0 bg-white z-50 flex flex-col items-center justify-center transition-opacity duration-500">
+        <div class="loader animate-spin rounded-full border-t-4 border-blue-500 border-solid h-16 w-16 mb-4"></div>
+        <h2 class="text-xl font-semibold text-gray-700">Loading SkyVault</h2>
+    </div>
+
+    <!-- Auth Modal -->
+    <div id="auth-modal" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md transform transition-all duration-300 scale-95 opacity-0">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-2xl font-bold text-gray-800">Welcome to SkyVault</h3>
+                    <button id="close-auth-modal" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div class="tabs flex border-b border-gray-200 mb-6">
+                    <button class="tab-btn active py-2 px-4 font-medium text-blue-600 border-b-2 border-blue-600" data-tab="login">Login</button>
+                    <button class="tab-btn py-2 px-4 font-medium text-gray-500 hover:text-gray-700" data-tab="register">Register</button>
+                </div>
+                
+                <div id="login-tab" class="tab-content">
+                    <form id="login-form" class="space-y-4">
+                        <div>
+                            <label for="login-email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                            <input type="email" id="login-email" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                        </div>
+                        <div>
+                            <label for="login-password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                            <input type="password" id="login-password" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                        </div>
+                        <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-300 transform hover:scale-105">
+                            Sign In
+                        </button>
+                    </form>
+                </div>
+                
+                <div id="register-tab" class="tab-content hidden">
+                    <form id="register-form" class="space-y-4">
+                        <div>
+                            <label for="register-name" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                            <input type="text" id="register-name" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                        </div>
+                        <div>
+                            <label for="register-email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                            <input type="email" id="register-email" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                        </div>
+                        <div>
+                            <label for="register-password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                            <input type="password" id="register-password" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                        </div>
+                        <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-300 transform hover:scale-105">
+                            Create Account
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Layout -->
+    <div class="min-h-screen flex flex-col">
+        <!-- Header -->
+        <header class="bg-white shadow-sm py-4 px-6 flex items-center justify-between sticky top-0 z-30">
+            <div class="flex items-center space-x-2">
+                <i class="fas fa-cloud text-blue-500 text-2xl"></i>
+                <h1 class="text-xl font-bold text-gray-800">SkyVault</h1>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <button id="upload-btn" class="hidden bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-300 flex items-center space-x-2">
+                    <i class="fas fa-upload"></i>
+                    <span>Upload</span>
+                </button>
+                
+                <div id="user-menu" class="hidden relative">
+                    <button id="user-menu-btn" class="flex items-center space-x-2 focus:outline-none">
+                        <div class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-semibold user-avatar">U</div>
+                        <i class="fas fa-chevron-down text-gray-500 text-xs"></i>
+                    </button>
+                    <div id="user-dropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 hidden">
+                        <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</a>
+                        <a href="#" id="logout-btn" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Sign out</a>
+                    </div>
+                </div>
+                
+                <button id="auth-btn" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-300">
+                    Sign In
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-6">
+            <!-- Upload Modal (hidden by default) -->
+            <div id="upload-modal" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden items-center justify-center p-4">
+                <div class="bg-white rounded-xl shadow-2xl w-full max-w-md transform transition-all duration-300 scale-95 opacity-0">
+                    <div class="p-6">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-xl font-bold text-gray-800">Upload Files</h3>
+                            <button id="close-upload-modal" class="text-gray-500 hover:text-gray-700">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        
+                        <div id="upload-area" class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-blue-500 transition duration-300 mb-4">
+                            <i class="fas fa-cloud-upload-alt text-4xl text-blue-500 mb-3"></i>
+                            <p class="text-gray-600 mb-2">Drag & drop files here or click to browse</p>
+                            <p class="text-sm text-gray-500">Supports: PDF, DOC, XLS, JPG, PNG, MP4, etc.</p>
+                            <input type="file" id="file-input" class="hidden" multiple>
+                        </div>
+                        
+                        <div id="upload-progress" class="hidden">
+                            <div class="flex justify-between text-sm text-gray-600 mb-1">
+                                <span>Uploading...</span>
+                                <span id="upload-percentage">0%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                <div id="upload-progress-bar" class="bg-blue-600 h-2.5 rounded-full" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        
+                        <div id="upload-success" class="hidden text-center py-4">
+                            <i class="fas fa-check-circle text-4xl text-green-500 mb-3"></i>
+                            <p class="text-gray-700 font-medium">Files uploaded successfully!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- File Browser -->
+            <div id="file-browser" class="hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800">My Files</h2>
+                    <div class="flex space-x-3">
+                        <div class="relative">
+                            <input type="text" id="search-files" placeholder="Search files..." class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition w-64">
+                            <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                        </div>
+                        <button id="grid-view-btn" class="p-2 text-gray-500 hover:text-blue-500 transition" title="Grid view">
+                            <i class="fas fa-th-large"></i>
+                        </button>
+                        <button id="list-view-btn" class="p-2 text-blue-500 transition" title="List view">
+                            <i class="fas fa-list"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Breadcrumbs -->
+                <div id="breadcrumbs" class="flex items-center text-sm text-gray-600 mb-6 overflow-x-auto whitespace-nowrap">
+                    <a href="#" class="text-blue-500 hover:underline" data-path="">SkyVault</a>
+                </div>
+                
+                <!-- Files Container -->
+                <div id="files-container" class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <!-- List View (default) -->
+                    <div id="list-view">
+                        <div class="grid grid-cols-12 gap-4 p-4 border-b border-gray-200 bg-gray-50 text-gray-500 font-medium text-sm">
+                            <div class="col-span-6">Name</div>
+                            <div class="col-span-2">Size</div>
+                            <div class="col-span-3">Last Modified</div>
+                            <div class="col-span-1">Actions</div>
+                        </div>
+                        <div id="files-list" class="divide-y divide-gray-200">
+                            <!-- Files will be loaded here dynamically -->
+                        </div>
+                    </div>
+                    
+                    <!-- Grid View (hidden by default) -->
+                    <div id="grid-view" class="hidden p-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                        <!-- Files will be loaded here dynamically -->
+                    </div>
+                </div>
+                
+                <!-- Empty State -->
+                <div id="empty-state" class="text-center py-16">
+                    <i class="fas fa-cloud text-5xl text-gray-300 mb-4"></i>
+                    <h3 class="text-xl font-medium text-gray-700 mb-2">Your SkyVault is empty</h3>
+                    <p class="text-gray-500 mb-6">Upload your first file to get started</p>
+                    <button id="upload-empty-btn" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition duration-300">
+                        Upload Files
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Welcome Section (shown when not logged in) -->
+            <div id="welcome-section" class="max-w-4xl mx-auto text-center py-16">
+                <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-6">Your Files, Anywhere, Anytime</h1>
+                <p class="text-xl text-gray-600 mb-10 max-w-2xl mx-auto">SkyVault offers secure cloud storage for all your files. Access them from any device, share with anyone, and never worry about losing your data.</p>
+                
+                <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6">
+                    <button id="welcome-signup-btn" class="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition duration-300 transform hover:scale-105 text-lg font-medium">
+                        Get Started - It's Free
+                    </button>
+                    <button id="welcome-login-btn" class="bg-white text-blue-600 px-8 py-3 rounded-lg border border-blue-600 hover:bg-blue-50 transition duration-300 transform hover:scale-105 text-lg font-medium">
+                        Sign In
+                    </button>
+                </div>
+                
+                <div class="mt-16 bg-white rounded-xl shadow-lg p-6 max-w-4xl mx-auto">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div class="feature-card p-4 rounded-lg hover:bg-gray-50 transition duration-300">
+                            <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 mb-4 mx-auto">
+                                <i class="fas fa-shield-alt text-xl"></i>
+                            </div>
+                            <h3 class="text-lg font-semibold text-gray-800 mb-2">Secure Storage</h3>
+                            <p class="text-gray-600">Military-grade encryption keeps your files safe from prying eyes.</p>
+                        </div>
+                        <div class="feature-card p-4 rounded-lg hover:bg-gray-50 transition duration-300">
+                            <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 mb-4 mx-auto">
+                                <i class="fas fa-mobile-alt text-xl"></i>
+                            </div>
+                            <h3 class="text-lg font-semibold text-gray-800 mb-2">Any Device</h3>
+                            <p class="text-gray-600">Access your files from smartphones, tablets, or computers.</p>
+                        </div>
+                        <div class="feature-card p-4 rounded-lg hover:bg-gray-50 transition duration-300">
+                            <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 mb-4 mx-auto">
+                                <i class="fas fa-infinity text-xl"></i>
+                            </div>
+                            <h3 class="text-lg font-semibold text-gray-800 mb-2">Unlimited Storage</h3>
+                            <p class="text-gray-600">Store as much as you need with our flexible plans.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-gray-800 text-white py-8 px-6">
+            <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <div class="flex items-center space-x-2 mb-4">
+                        <i class="fas fa-cloud text-blue-400 text-2xl"></i>
+                        <h3 class="text-xl font-bold">SkyVault</h3>
+                    </div>
+                    <p class="text-gray-400">Secure cloud storage for everyone. Access your files from anywhere in the world.</p>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Product</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Features</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Pricing</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Apps</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">API</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Company</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">About</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Jobs</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Blog</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Press</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Support</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Help Center</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Community</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Contact Us</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Privacy Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="max-w-6xl mx-auto mt-8 pt-6 border-t border-gray-700 text-center text-gray-400 text-sm">
+                <p>&copy; 2023 SkyVault. All rights reserved.</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- File Context Menu -->
+    <div id="file-context-menu" class="fixed bg-white shadow-lg rounded-md py-1 z-50 hidden w-48">
+        <a href="#" class="context-menu-item" data-action="download"><i class="fas fa-download mr-2"></i> Download</a>
+        <a href="#" class="context-menu-item" data-action="rename"><i class="fas fa-edit mr-2"></i> Rename</a>
+        <a href="#" class="context-menu-item" data-action="share"><i class="fas fa-share-alt mr-2"></i> Share</a>
+        <div class="border-t border-gray-200 my-1"></div>
+        <a href="#" class="context-menu-item text-red-500" data-action="delete"><i class="fas fa-trash mr-2"></i> Delete</a>
+    </div>
+
+    <!-- JavaScript -->
+    <!-- Change these lines at the bottom of your HTML file -->
+<script type="module" src="js/auth.js"></script>
+<script type="module" src="js/storage.js"></script>
+<script type="module" src="js/ui.js"></script>
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

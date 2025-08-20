@@ -1,0 +1,182 @@
+/* Base Styles */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+body {
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* File Icons */
+.file-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    margin-right: 12px;
+}
+
+.file-icon.pdf {
+    background-color: #FFEBEE;
+    color: #F44336;
+}
+
+.file-icon.doc, .file-icon.docx {
+    background-color: #E3F2FD;
+    color: #2196F3;
+}
+
+.file-icon.xls, .file-icon.xlsx {
+    background-color: #E8F5E9;
+    color: #4CAF50;
+}
+
+.file-icon.ppt, .file-icon.pptx {
+    background-color: #FFF3E0;
+    color: #FF9800;
+}
+
+.file-icon.img, .file-icon.jpg, .file-icon.png, .file-icon.gif {
+    background-color: #F3E5F5;
+    color: #9C27B0;
+}
+
+.file-icon.mp3, .file-icon.wav {
+    background-color: #E0F7FA;
+    color: #00BCD4;
+}
+
+.file-icon.mp4, .file-icon.mov {
+    background-color: #E8EAF6;
+    color: #3F51B5;
+}
+
+.file-icon.zip, .file-icon.rar {
+    background-color: #EFEBE9;
+    color: #795548;
+}
+
+.file-icon.default {
+    background-color: #ECEFF1;
+    color: #607D8B;
+}
+
+/* Context Menu */
+.context-menu-item {
+    display: block;
+    padding: 8px 16px;
+    text-decoration: none;
+    color: #333;
+    font-size: 14px;
+}
+
+.context-menu-item:hover {
+    background-color: #f5f5f5;
+}
+
+/* File Item Hover */
+.file-item:hover {
+    background-color: #f8fafc;
+}
+
+/* Loading Animation */
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.animate-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 640px) {
+    #files-container {
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+    }
+    
+    #grid-view {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .file-icon {
+        width: 32px;
+        height: 32px;
+        margin-right: 8px;
+    }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    body {
+        background-color: #111827;
+        color: #f3f4f6;
+    }
+    
+    .bg-white {
+        background-color: #1f2937 !important;
+    }
+    
+    .text-gray-800 {
+        color: #f3f4f6 !important;
+    }
+    
+    .text-gray-700 {
+        color: #e5e7eb !important;
+    }
+    
+    .text-gray-600 {
+        color: #d1d5db !important;
+    }
+    
+    .border-gray-200 {
+        border-color: #374151 !important;
+    }
+    
+    .bg-gray-50 {
+        background-color: #1f2937 !important;
+    }
+    
+    #file-browser {
+        background-color: #111827 !important;
+    }
+    
+    .file-item:hover {
+        background-color: #1f2937 !important;
+    }
+    
+    .context-menu-item {
+        color: #f3f4f6 !important;
+    }
+    
+    .context-menu-item:hover {
+        background-color: #374151 !important;
+    }
+}
